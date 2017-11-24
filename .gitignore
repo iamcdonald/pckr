@@ -1,2 +1,4 @@
 i.DS_store
 node_modules
+.nyc_output
+coverage
