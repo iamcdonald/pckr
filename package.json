@@ -1,0 +1,22 @@
+{
+  "name": "pckr",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava test/**/*.js" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamcdonald/pckr.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iamcdonald/pckr/issues"
+  },
+  "homepage": "https://github.com/iamcdonald/pckr#readme",
+  "devDependencies": {
+    "ava": "^0.23.0"
+  }
+}
