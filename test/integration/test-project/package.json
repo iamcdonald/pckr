@@ -1,0 +1,14 @@
+{
+  "name": "test-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bootstrap": "lerna bootstrap"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lerna": "^2.5.1"
+  }
+}

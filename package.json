@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "ava test/**/*.js",
-    "coverage": "nyc npm test"
+    "test:unit": "ava 'test/unit/**/*.js'",
+    "test:integration": "ava 'test/integration/**/*.js'",
+    "test:coverage": "nyc npm run test:unit"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,11 @@
   "homepage": "https://github.com/iamcdonald/pckr#readme",
   "devDependencies": {
     "ava": "^0.23.0",
-    "nyc": "^11.3.0"
+    "nyc": "^11.3.0",
+    "testdouble": "^3.2.6"
+  },
+  "dependencies": {
+    "npm": "^5.5.1"
   },
   "nyc": {
     "lines": 100,
