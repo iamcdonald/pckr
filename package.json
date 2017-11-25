@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:unit": "ava 'test/unit/**/*.js'",
-    "test:integration": "ava 'test/integration/**/*.js'",
+    "test:unit": "ava 'test/unit/**/*.spec.js'",
+    "test:integration": "test/integration/setup.sh && ava 'test/integration/**/*.spec.js'; test/integration/cleanup.sh",
     "test:coverage": "nyc npm run test:unit"
   },
   "repository": {
