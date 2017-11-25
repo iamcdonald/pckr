@@ -1,7 +1,17 @@
 const npm = require('./npm');
+const path = require('path');
+const fs = require('fs');
 
-const pack = async modulePath => {
-  return npm.pack(modulePath);
+const move = (file, toLocation) => {
+  const newName = path.resolve(toLocation, path.basename(file));
+  fs.renameSync(file, newName);
+  return newName;
+};
+
+
+const pack = async (modulePath, toLocation) => {
+  const packagePath = await npm.pack(modulePath);
+  return move(packagePath, toLocation);
 };
 
 module.exports = {
