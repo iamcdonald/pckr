@@ -6,7 +6,8 @@ const isModule = modulePath =>
 
 const getSubDirsOfFolder = folder => 
   fs.readdirSync(folder)
-    .map(subdir => path.resolve(folder, subdir));
+    .map(subdir => path.resolve(folder, subdir))
+    .filter(isDirectory);
 
 const getNodeModules = folder => {
   const dirs = getSubDirsOfFolder(folder);
@@ -20,9 +21,17 @@ const getNodeModules = folder => {
 const isSymlink = module =>
   fs.lstatSync(module).isSymbolicLink();
 
-const getSymlinked = modulePath =>
-  getNodeModules(path.resolve(modulePath, 'node_modules'))
-    .filter(isSymlink);
+const isDirectory = src => 
+  fs.statSync(src).isDirectory();
+
+const getSymlinked = modulePath => {
+  const nodeModulesPath = path.resolve(modulePath, 'node_modules');
+  if (fs.existsSync(nodeModulesPath)) {
+    return getNodeModules(nodeModulesPath)
+      .filter(isSymlink);
+  }
+  return [];
+};
 
 module.exports = {
   getSymlinked
