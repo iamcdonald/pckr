@@ -3,6 +3,10 @@ const td = require('testdouble');
 
 
 const setup = () => {
+  td.config({
+    ignoreWarnings: true
+  });
+
   const stubs = {
     npm: td.replace('npm', {
       load: td.function(),
@@ -11,6 +15,7 @@ const setup = () => {
     process: td.replace('process', {
       cwd: td.function()
     }),
+    child_process: td.replace('child_process'),
     path: td.replace('path', {
       resolve: (b, r) => `${b}/${r}`
     })
@@ -20,35 +25,51 @@ const setup = () => {
 };
 
 const teardown = () => {
+  td.config({
+    ignoreWarnings: false
+  });
   td.reset();
 };
 
-const setupHappyPath = context => {
+const setupPackStubs = context => {
   const { stubs } = context;
-  const constants = {
+  const c = {
     base: '/base',
     packagePath: '../a/path/l',
     packedResult: 'a-thing-0.1.3.tgz',
     defaultPackedResult: 'default-0.0.0.tgz'
   };
-  td.when(stubs.process.cwd()).thenReturn(constants.base);
+  td.when(stubs.process.cwd()).thenReturn(c.base);
   td.when(stubs.npm.load()).thenCallback(null);
-  td.when(stubs.npm.pack('.')).thenCallback(null, [constants.packedResult]);
-  td.when(stubs.npm.pack(constants.packagePath)).thenCallback(null, [constants.packedResult]);
+  td.when(stubs.npm.pack('.')).thenCallback(null, [c.packedResult]);
+  td.when(stubs.npm.pack(c.packagePath)).thenCallback(null, [c.packedResult]);
+  return Object.assign({}, context, { c });
+};
 
-  return Object.assign({}, context, { constants });
+const setupInstallStubs = context => {
+  const { stubs } = context;
+  const c = {
+    module: '/a/path',
+    file: '/a/path/l-0.0.0.tgz'
+  };
+  stubs.spawnStream = td.object(['on']);
+  td.when(stubs.spawnStream.on('close')).thenCallback(0);
+  td.when(stubs.child_process.spawn('npm', ['install', c.file], {
+    cwd: c.module,
+    stdio: 'inherit'
+  })).thenReturn(stubs.spawnStream);
+  return Object.assign({}, context, { c });
 };
 
 test.beforeEach(t => {
   t.context = setup();
-  t.context = setupHappyPath(t.context);
 });
 
 test.afterEach.always(teardown);
 
 
-test('pack - bails if load fails', async t => {
-  const { stubs, testee } = t.context;
+test('npm - pack - bails if load fails', async t => {
+  const { stubs, testee } = setupPackStubs(t.context);
   const error = new Error('Load Died');
   td.when(stubs.npm.load()).thenCallback(error);
   try {
@@ -58,8 +79,8 @@ test('pack - bails if load fails', async t => {
   }
 });
 
-test('pack - bails if pack fails', async t => {
-  const { stubs, testee } = t.context;
+test('npm - pack - bails if pack fails', async t => {
+  const { stubs, testee } = setupPackStubs(t.context);
   const error = new Error('Pack Died');
   td.when(stubs.npm.pack('.')).thenCallback(error);
   try {
@@ -69,13 +90,27 @@ test('pack - bails if pack fails', async t => {
   }
 });
 
-test('pack - packs default path if none provided', async t => {
-  const { stubs, testee, constants } = t.context;
-  t.is(await testee.pack(), `${constants.base}/${constants.packedResult}`);
+test('npm - pack - packs chosen package if path provided', async t => {
+  const { testee, c } = setupPackStubs(t.context);
+  t.is(await testee.pack(c.packagePath), `${c.base}/${c.packedResult}`);
 });
 
-test('pack - packs chosen package if path provided', async t => {
-  const { testee, constants } = t.context;
-  t.is(await testee.pack(constants.packagePath), `${constants.base}/${constants.packedResult}`);
+test('npm - installFileToModule - bails if install fails', async t => {
+  const { stubs, testee, c } = setupInstallStubs(t.context);
+  td.when(stubs.spawnStream.on('close')).thenCallback(1);
+  try {
+    await testee.installFileToModule(c.file, c.module);
+  } catch (code) {
+    t.is(code, 1);
+  }
 });
 
+test('npm - installFileToModule - npm installs file for given module', async t => {
+  t.plan(0);
+  const { testee, stubs, c } = setupInstallStubs(t.context);
+  await testee.installFileToModule(c.file, c.module);
+  td.verify(stubs.child_process.spawn('npm', ['install', c.file], {
+    cwd: c.module,
+    stdio: 'inherit'
+  }));
+});

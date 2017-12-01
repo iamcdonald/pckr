@@ -1,6 +1,8 @@
 const npm = require('npm');
 const process = require('process');
 const path = require('path');
+const { spawn } = require('child_process');
+const td = require('testdouble');
 
 const _load = () => {
   return new Promise((resolve, reject) => {
@@ -32,6 +34,23 @@ const pack = async modulePath => {
   return path.resolve(process.cwd(), packageName);
 };
 
+const installFileToModule = (file, modulePath) => {
+  return new Promise((resolve, reject) => {
+    const p = spawn('npm', ['install', file], {
+      cwd: modulePath,
+      stdio: 'inherit'
+    });
+    p.on('close', code => {
+      if (code > 0) {
+        reject(code);
+        return;
+      }
+      resolve(code);
+    })
+  });
+};
+
 module.exports = {
-  pack
+  pack,
+  installFileToModule
 };

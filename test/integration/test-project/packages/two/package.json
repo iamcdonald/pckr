@@ -1,5 +1,5 @@
 {
-  "name": "two",
+  "name": "two-x-x",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,9 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@nsp/four": "*",
+    "@nsp/four-x-x": "*",
     "left-pad": "^1.2.0",
-    "three": "*"
+    "three-x-x": "*",
+    "five-x-x": "*"
   },
   "author": "",
   "license": "ISC"
