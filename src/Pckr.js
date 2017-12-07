@@ -13,8 +13,8 @@ class Pckr {
     return this.module.getPackagePath();
   }
 
-  async install() {
-    await this.module.install()
+  install() {
+    this.module.install()
   }
 };
 

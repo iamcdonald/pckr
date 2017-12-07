@@ -52,12 +52,6 @@ const setupInstallStubs = context => {
     module: '/a/path',
     file: '/a/path/l-0.0.0.tgz'
   };
-  stubs.spawnStream = td.object(['on']);
-  td.when(stubs.spawnStream.on('close')).thenCallback(0);
-  td.when(stubs.child_process.spawn('npm', ['install', c.file, '--no-save'], {
-    cwd: c.module,
-    stdio: 'inherit'
-  })).thenReturn(stubs.spawnStream);
   return Object.assign({}, context, { c });
 };
 
@@ -99,18 +93,8 @@ test('npm - installFileToModule - npm installs file for given module', async t =
   t.plan(0);
   const { testee, stubs, c } = setupInstallStubs(t.context);
   await testee.installFileToModule(c.file, c.module);
-  td.verify(stubs.child_process.spawn('npm', ['install', c.file, '--no-save'], {
+  td.verify(stubs.child_process.execSync(`npm install ${c.file}`, {
     cwd: c.module,
     stdio: 'inherit'
   }));
-});
-
-test('npm - installFileToModule - bails if install fails', async t => {
-  const { stubs, testee, c } = setupInstallStubs(t.context);
-  td.when(stubs.spawnStream.on('close')).thenCallback(1);
-  try {
-    await testee.installFileToModule(c.file, c.module);
-  } catch (code) {
-    t.is(code, 1);
-  }
 });

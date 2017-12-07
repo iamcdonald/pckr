@@ -1,7 +1,7 @@
 const npm = require('npm');
 const process = require('process');
 const path = require('path');
-const { spawn } = require('child_process');
+const { execSync } = require('child_process');
 const td = require('testdouble');
 
 const _load = () => {
@@ -35,18 +35,9 @@ const pack = async modulePath => {
 };
 
 const installFileToModule = (file, modulePath) => {
-  return new Promise((resolve, reject) => {
-    const p = spawn('npm', ['install', file, '--no-save'], {
-      cwd: modulePath,
-      stdio: 'inherit'
-    });
-    p.on('close', code => {
-      if (code > 0) {
-        reject(code);
-        return;
-      }
-      resolve(code);
-    })
+  execSync(`npm install ${file}`, {
+    cwd: modulePath,
+    stdio: 'inherit'
   });
 };
 
