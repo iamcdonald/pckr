@@ -35,7 +35,7 @@ test('Pckr - constructor', t => {
   const { Pckr, stubs } = t.context;
   const location = 'a/a/f';
   const p = new Pckr(location);
-  td.verify(new stubs.Module(location))
+  td.verify(new stubs.Module(location, true))
   t.truthy(p.module instanceof stubs.Module);
 });
 

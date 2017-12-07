@@ -8,8 +8,9 @@ const PackageJson = require('./PackageJson');
 const pckrPckr = require('../pckrPckr');
 
 class Module {
-  constructor(location) {
+  constructor(location, root = false) {
     this.location = location;
+    this.root = root;
     this.packageJson = new PackageJson(location);
     this.dependencies = new Dependencies(location);
     this.symlinkDirectory = new SymlinkDirectory(location);
@@ -17,7 +18,9 @@ class Module {
 
   _setup() {
     this.symlinkDirectory.create();
-    this.symlinkDirectory.copyFile(pckrPckr.getPath());
+    if (this.root) {
+      this.symlinkDirectory.copyFile(pckrPckr.getPath());
+    }
   }
 
   _clean() {
@@ -26,9 +29,15 @@ class Module {
   }
 
   _rewritePackageJson(modules) {
-    this.packageJson.updateScripts({
-      preinstall: `npm install ${this.symlinkDirectory.getPckrPath()} && pckr install`
-    });
+    if (this.root) {
+      this.packageJson.updateScripts({
+        postinstall: `npm install ${this.symlinkDirectory.getPckrPath()} && pckr install && npm dedupe --ignore-scripts`
+      });
+    } else {
+      this.packageJson.updateScripts({
+        postinstall: `pckr install`
+      });
+    }
     modules.forEach(mod => this.packageJson.removeDependency(mod.packageJson.getName()));
     this.packageJson.replace();
   }

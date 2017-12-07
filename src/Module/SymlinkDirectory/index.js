@@ -30,6 +30,10 @@ class SymlinkDirectory {
     fse.removeSync(this.getPath());
   }
 
+  exists() {
+    return fse.existsSync(this.getPath());
+  }
+
   addFile(file) {
     const filename = path.basename(file);
     const toLocation = path.resolve(this.getPath(), filename);
@@ -45,9 +49,12 @@ class SymlinkDirectory {
   }
 
   getFilePaths() {
-    return fse.readdirSync(this.getPath())
-      .map(fp => path.resolve(this.getPath(), fp))
-      .map(relativeTo(this.location));
+    if (this.exists()) {
+      return fse.readdirSync(this.getPath())
+        .map(fp => path.resolve(this.getPath(), fp))
+        .map(relativeTo(this.location));
+    }
+    return [];
   }
 
   getSymlinkFilePaths() {

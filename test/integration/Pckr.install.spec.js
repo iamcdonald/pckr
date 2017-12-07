@@ -26,13 +26,7 @@ const setup = async () => {
   const p = new Pckr(MODULE_TO_PACK);
   const packedPath = await p.pack(TO_LOCATION);
   const extractOne = untar(packedPath);
-  const extractTwo = untar(path.resolve(extractOne, 'sym-deps', 'two-x-x-1.0.0.tgz'));
-  const extractFour = untar(path.resolve(extractTwo, 'sym-deps', 'nsp-four-x-x-1.0.0.tgz'));
-  return {
-    one: extractOne,
-    two: extractTwo,
-    four: extractFour
-  };
+  return extractOne;
 };
 
 const teardown = () => {
@@ -44,23 +38,26 @@ const isInstalled = (module, extractPath) =>
 
 test.beforeEach(async t => {
   t.context = {
-    extractPaths: await setup()
+    extractPath: await setup()
   };
 });
 
 test.afterEach.always(teardown);
 
 test('Pckr - install - installs all deps in sym-deps', async t => {
-  const { extractPaths: { four } } = t.context;
-  const p = new Pckr(four);
-  await p.install();
-  t.truthy(isInstalled('five-x-x', four));
-});
-
-test('Pckr - install - installs recursive sym-deps', async t => {
-  const { extractPaths: { two } } = t.context;
-  const p = new Pckr(two);
-  await p.install();
-  t.truthy(isInstalled('three-x-x', two));
-  t.truthy(isInstalled('@nsp/four-x-x', two));
+  const { extractPath } = t.context;
+  execSync('npm install', {
+    cwd: extractPath
+  });
+  const index = require(path.resolve(extractPath, 'index'));
+  const expected = [
+    'one',
+    ['two',
+      ['three'],
+      ['four', ['five']],
+      ['five'],
+      '001'
+    ]
+  ];
+  t.deepEqual(expected, index());
 });

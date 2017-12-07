@@ -36,7 +36,7 @@ const pack = async modulePath => {
 
 const installFileToModule = (file, modulePath) => {
   return new Promise((resolve, reject) => {
-    const p = spawn('npm', ['install', file], {
+    const p = spawn('npm', ['install', file, '--no-save'], {
       cwd: modulePath,
       stdio: 'inherit'
     });

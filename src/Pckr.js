@@ -3,7 +3,7 @@ const Module = require('./Module');
 
 class Pckr {
   constructor(location) {
-    this.module = new Module(location);
+    this.module = new Module(location, true);
   }
 
   async pack() {

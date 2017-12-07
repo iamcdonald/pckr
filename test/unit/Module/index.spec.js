@@ -25,9 +25,9 @@ const setup = () => {
     return [...arguments].join('/');
   };
 
-  const Pckr = require('../../../src/Module');
+  const Module = require('../../../src/Module');
 
-  return { stubs, Pckr };
+  return { stubs, Module };
 };
 
 const getPathFromNode = n => {
@@ -135,10 +135,21 @@ test.beforeEach(t => {
 
 test.afterEach.always(teardown);
 
-test('Module - constructor', t => {
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+test('Module - constructor - root', t => {
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name, true);
   t.is(p.location, c.tree.data.name);
+  t.is(p.root, true);
+  t.is(p.dependencies, c.tree.data.stubs.dependencies);
+  t.is(p.symlinkDirectory, c.tree.data.stubs.symlinkDirectory);
+  t.is(p.packageJson, c.tree.data.stubs.packageJson);
+});
+
+test('Module - constructor - non-root', t => {
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
+  t.is(p.location, c.tree.data.name);
+  t.is(p.root, false);
   t.is(p.dependencies, c.tree.data.stubs.dependencies);
   t.is(p.symlinkDirectory, c.tree.data.stubs.symlinkDirectory);
   t.is(p.packageJson, c.tree.data.stubs.packageJson);
@@ -146,8 +157,8 @@ test('Module - constructor', t => {
 
 test('Module - pack - recursively - creates symlink directory', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -155,21 +166,26 @@ test('Module - pack - recursively - creates symlink directory', async t => {
   });
 });
 
-test('Module - pack -recursively - copys pckr package to symlink directory', async t => {
-  t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+test('Module - pack - root - copys pckr package to symlink directory', async t => {
+  t.plan(0);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name, true);
   await p.pack();
-  c.tree.traverse(n => {
-    t.pass();
-    td.verify(n.data.stubs.symlinkDirectory.copyFile(c.pckrPath));
-  });
+  td.verify(c.tree.data.stubs.symlinkDirectory.copyFile(c.pckrPath));
+});
+
+test('Module - pack - non-root - copys pckr package to symlink directory', async t => {
+  t.plan(0);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
+  await p.pack();
+  td.verify(c.tree.data.stubs.symlinkDirectory.copyFile(c.pckrPath), { times: 0 });
 });
 
 test('Module - pack - recursively - packs symlink dependencies', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -179,8 +195,8 @@ test('Module - pack - recursively - packs symlink dependencies', async t => {
 
 test('Module - pack - recursively - moves packaged symlink dependencies into symlink directory', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   const root = c.tree;
   root.traverse(n => {
@@ -191,23 +207,34 @@ test('Module - pack - recursively - moves packaged symlink dependencies into sym
   });
 });
 
-test('Module - pack - recursively - updates scripts with preinstall task', async t => {
+test('Module - pack - root - updates scripts with postinstall task that installs pckr, calls \'pckr install\' and dedupes modules', async t => {
+  t.plan(0);
+  const { Module, stubs, c } = t.context;
+  let root = c.tree;
+  const p = new Module(root.data.name, true);
+  await p.pack();
+  td.verify(root.data.stubs.packageJson.updateScripts({
+    postinstall: `npm install ${root.data.stubs.symlinkDirectory.getPckrPath()} && pckr install && npm dedupe --ignore-scripts`
+  }));
+});
+
+test('Module - pack - non-root - recursively - updates scripts with postinstall task that install pckr, calls \'pckr install\' and dedupes modules', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
-    td.verify(n.data.stubs.packageJson.updateScripts({
-      preinstall: `npm install ${n.data.stubs.symlinkDirectory.getPckrPath()} && pckr install`
+    td.verify(c.tree.data.stubs.packageJson.updateScripts({
+      postinstall: `pckr install`
     }));
   });
 });
 
 test('Module - pack - recursively - remove dependencies from each package.json', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -219,8 +246,8 @@ test('Module - pack - recursively - remove dependencies from each package.json',
 
 test('Module - pack - recursively - packages module', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -230,8 +257,8 @@ test('Module - pack - recursively - packages module', async t => {
 
 test('Module - pack - recursively - moves packaged module into module directory', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -241,8 +268,8 @@ test('Module - pack - recursively - moves packaged module into module directory'
 
 test('Module - pack - recursively - replace package json', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -252,8 +279,8 @@ test('Module - pack - recursively - replace package json', async t => {
 
 test('Module - pack - recursively - restores package json', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = t.context;
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -263,8 +290,8 @@ test('Module - pack - recursively - restores package json', async t => {
 
 test('Module - pack - recursively - removes symlink directory', async t => {
   t.plan(4);
-  const { Pckr, stubs, c } = setupStubs(t.context);
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = setupStubs(t.context);
+  const p = new Module(c.tree.data.name);
   await p.pack();
   c.tree.traverse(n => {
     t.pass();
@@ -273,22 +300,22 @@ test('Module - pack - recursively - removes symlink directory', async t => {
 });
 
 test('Module - getPackagePath - when module not yet packed throws error', t => {
-  const { Pckr, stubs, c } = setupStubs(t.context);
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = setupStubs(t.context);
+  const p = new Module(c.tree.data.name);
   t.throws(() => p.getPackagePath(), 'Module not yet packed');
 });
 
 test('Module - getPackagePath - when module packed returns path to packed file', async t => {
-  const { Pckr, stubs, c } = setupStubs(t.context);
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = setupStubs(t.context);
+  const p = new Module(c.tree.data.name);
   await p.pack();
   t.is(p.getPackagePath(), c.tree.data.packedLocation);
 });
 
 test('Module - install - installs all symlink dependencies', t => {
   t.plan(0);
-  const { Pckr, stubs, c } = setupStubs(t.context);
-  const p = new Pckr(c.tree.data.name);
+  const { Module, stubs, c } = setupStubs(t.context);
+  const p = new Module(c.tree.data.name);
   p.install();
   const root = c.tree;
   root.children.forEach(c => {

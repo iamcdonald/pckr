@@ -94,7 +94,7 @@ test('SymlinkDirectory - copyFile - when name provided - copies file to sym-deps
   td.verify(stubs.fse.copyFileSync(file, `${location}/sym-deps/a-name.tgz`));
 });
 
-test('SymlinkDirectory - getFilePaths - returns files in directory', t => {
+test('SymlinkDirectory - getFilePaths - when directory exists - returns files in directory', t => {
   t.plan(3);
   const { SymlinkDirectory, stubs } = t.context;
   const location = '/a/b/c'
@@ -103,12 +103,28 @@ test('SymlinkDirectory - getFilePaths - returns files in directory', t => {
     'file-2.tgz',
     'file-3.tgz'
   ];
+  td.when(stubs.fse.existsSync(`${location}/sym-deps`)).thenReturn(true);
   td.when(stubs.fse.readdirSync(`${location}/sym-deps`)).thenReturn(files);
   const sd = new SymlinkDirectory(location);
   const retrievedFiles = sd.getFilePaths();
   retrievedFiles.forEach((f, idx) => {
     t.is(f, `./sym-deps/${files[idx]}`);
   });
+});
+
+test('SymlinkDirectory - getFilePaths - when directory exists - returns files in directory', t => {
+  const { SymlinkDirectory, stubs } = t.context;
+  const location = '/a/b/c'
+  const files = [
+    'file-1.tgz',
+    'file-2.tgz',
+    'file-3.tgz'
+  ];
+  td.when(stubs.fse.existsSync(`${location}/sym-deps`)).thenReturn(false);
+  td.when(stubs.fse.readdirSync(`${location}/sym-deps`)).thenReturn(files);
+  const sd = new SymlinkDirectory(location);
+  const retrievedFiles = sd.getFilePaths();
+  t.deepEqual(retrievedFiles, []);
 });
 
 test('SymlinkDirectory - getSymlinkFiles - returns all files in directory except those matching pckr name', t => {
@@ -122,6 +138,7 @@ test('SymlinkDirectory - getSymlinkFiles - returns all files in directory except
     'file-3.tgz',
     'pckr-1.0.0.tgz'
   ];
+  td.when(stubs.fse.existsSync(`${location}/sym-deps`)).thenReturn(true);
   td.when(stubs.fse.readdirSync(`${location}/sym-deps`)).thenReturn(files);
   const sd = new SymlinkDirectory(location);
   const retrievedFiles = sd.getSymlinkFilePaths();
@@ -142,6 +159,7 @@ test('SymlinkDirectory - getPckrPath - returns file matching pckr file name from
     'pckr-2.0.0.tgz',
     'file-3.tgz'
   ];
+  td.when(stubs.fse.existsSync(`${location}/sym-deps`)).thenReturn(true);
   td.when(stubs.fse.readdirSync(`${location}/sym-deps`)).thenReturn(files);
   const sd = new SymlinkDirectory(location);
   t.is(sd.getPckrPath(), `./sym-deps/pckr-2.0.0.tgz`);
