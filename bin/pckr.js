@@ -6,9 +6,16 @@ const Pckr = require('pckr');
 
 program
   .command('install')
-  .action(async function (opts) {
+  .action(function () {
     const pckr = new Pckr(process.cwd());
-    await pckr.install();
+    pckr.install();
+  });
+
+program
+  .command('pack')
+  .action(function () {
+    const pckr = new Pckr(process.cwd());
+    pckr.pack();
   });
 
 program.parse(process.argv);
