@@ -47,25 +47,19 @@ class Module {
       .map(location => new Module(location));
   }
 
-  async _packModules(modules) {
+  _packModules(modules) {
     for (let module of modules) {
-      await module.pack();
+      module.pack();
       this.symlinkDirectory.addFile(module.getPackagePath())
     }
   }
 
-  async _package() {
-    const currentLocation = await npm.pack(this.location);
-    this.filename = path.basename(currentLocation);
-    fse.renameSync(currentLocation, this.getPackagePath());
-  }
-
-  async pack() {
+  pack() {
     this._setup();
     const symlinkModules = this._getSymlinkedDependenciesAsModules();
-    await this._packModules(symlinkModules);
+    this._packModules(symlinkModules);
     this._rewritePackageJson(symlinkModules);
-    this.packedLocation = await this._package();
+    this.filename = npm.pack(this.location)
     this._clean();
   }
 
@@ -76,11 +70,9 @@ class Module {
     return path.resolve(this.location, this.filename);
   }
 
-  async install() {
-    return Promise.all(
-      this.symlinkDirectory.getSymlinkFilePaths()
-        .map(file => npm.installFileToModule(file, this.location))
-    );
+  install() {
+    this.symlinkDirectory.getSymlinkFilePaths()
+      .forEach(file => npm.installFileToModule(file, this.location))
   }
 };
 

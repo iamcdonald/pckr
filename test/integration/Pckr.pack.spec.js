@@ -2,7 +2,6 @@ const test = require('ava');
 const path = require('path');
 const fse = require('fs-extra');
 const { execSync } = require('child_process');
-const rimraf = require('rimraf');
 const Pckr = require('../../src/Pckr');
 const SymlinkDirectory = require('../../src/Module/SymlinkDirectory');
 

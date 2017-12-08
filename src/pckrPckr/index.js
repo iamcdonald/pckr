@@ -4,9 +4,11 @@ const npm = require('../npm');
 
 let PCKR_PATH;
 
-const pack = async () => {
-  PCKR_PATH = await npm.pack(path.resolve(__dirname, '../../'));
-}
+const pack = () => {
+  const pckrPath = path.resolve(__dirname, '../../');
+  const pckrName = npm.pack(pckrPath);
+  PCKR_PATH = path.resolve(pckrPath, pckrName);
+};
 
 const remove = () => fs.unlinkSync(PCKR_PATH);
 

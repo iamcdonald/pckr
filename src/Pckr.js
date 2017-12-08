@@ -6,9 +6,9 @@ class Pckr {
     this.module = new Module(location, true);
   }
 
-  async pack() {
-    await pckrPckr.pack();
-    await this.module.pack();
+  pack() {
+    pckrPckr.pack();
+    this.module.pack();
     pckrPckr.remove();
     return this.module.getPackagePath();
   }

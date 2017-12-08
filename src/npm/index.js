@@ -1,43 +1,15 @@
-const npm = require('npm');
-const process = require('process');
-const path = require('path');
 const { execSync } = require('child_process');
-const td = require('testdouble');
 
-const _load = () => {
-  return new Promise((resolve, reject) => {
-    npm.load((e) => {
-      if (e) {
-        reject(e);
-        return;
-      }
-      resolve();
-    });
+const pack = (modulePath) => {
+  const res = execSync('npm pack', {
+    cwd: modulePath
   });
-};
-
-const _pack = (path = '.') => {
-  return new Promise((resolve, reject) => {
-    npm.pack(path, (err, res) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(res);
-    });
-  });
-};
-
-const pack = async modulePath => {
-  await _load();
-  const [packageName] = await _pack(modulePath);
-  return path.resolve(process.cwd(), packageName);
+  return res.toString().replace(/\n/, '');
 };
 
 const installFileToModule = (file, modulePath) => {
   execSync(`npm install ${file}`, {
-    cwd: modulePath,
-    stdio: 'inherit'
+    cwd: modulePath
   });
 };
 

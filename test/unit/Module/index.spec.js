@@ -86,9 +86,9 @@ const setupNodeStubs = stubs => n => {
   td.when(new stubs.SymlinkDirectory(path)).thenReturn(n.data.stubs.symlinkDirectory);
   td.when(new stubs.PackageJson(path)).thenReturn(n.data.stubs.packageJson);
   n.children.forEach(c => {
-    td.when(stubs.npm.installFileToModule(c.data.packedLocation, n.data.path)).thenResolve();
+    td.when(stubs.npm.installFileToModule(c.data.packedLocation, n.data.path)).thenReturn();
   });
-  td.when(stubs.npm.pack(path)).thenResolve(n.data.packedLocation);
+  td.when(stubs.npm.pack(path)).thenReturn(n.data.packedFileName);
   td.when(stubs.path.basename(n.data.packedLocation)).thenReturn(n.data.packedFileName);
 };
 
@@ -112,7 +112,7 @@ const setupStubs = context => {
     }
   };
 
-  td.when(stubs.pckrPckr.pack()).thenResolve();
+  td.when(stubs.pckrPckr.pack()).thenReturn();
   td.when(stubs.pckrPckr.getPath()).thenReturn(c.pckrPath);
   c.tree = Forestry.parse(c.tree, 'subModules');
 
@@ -252,17 +252,6 @@ test('Module - pack - recursively - packages module', async t => {
   c.tree.traverse(n => {
     t.pass();
     td.verify(stubs.npm.pack(n.data.path));
-  });
-});
-
-test('Module - pack - recursively - moves packaged module into module directory', async t => {
-  t.plan(4);
-  const { Module, stubs, c } = t.context;
-  const p = new Module(c.tree.data.name);
-  await p.pack();
-  c.tree.traverse(n => {
-    t.pass();
-    td.verify(stubs.fse.renameSync(n.data.packedLocation, `${n.data.path}/${n.data.packedFileName}`));
   });
 });
 

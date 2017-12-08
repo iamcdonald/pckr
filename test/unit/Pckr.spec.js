@@ -11,7 +11,7 @@ const setup = () => {
     Module: td.replace('../../src/Module')
   };
 
-  td.when(stubs.pckrPckr.pack()).thenResolve();
+  td.when(stubs.pckrPckr.pack()).thenReturn();
 
   const Pckr = require('../../src/Pckr');
 
