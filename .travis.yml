@@ -1,15 +1,46 @@
 language: node_js
 node_js:
-  - "8"
+- '8'
 
-install:
-  - npm install
+cache:
+  directories:
+    - node_modules
 
-script:
-  - npm run test:coverage && npm run test:integration:setup && npm run test:integration
+stages:
+  - install
+  - unit-test
+  - integration-test
+  - name: tag
+    if: branch = masterx
+  - name: deploy
+    if: tag =~ ^([0-9]\.){2}[0-9]$
 
-after_success:
-  - npm install coveralls && nyc report --reporter=text-lcov | coveralls
-
-after_script:
-  - npm run test:integration:cleanup
+jobs:
+  include:
+    - stage: install
+      script:
+        - npm install
+    - stage: unit-test
+      script:
+        - npm run test:coverage
+        - npm install coveralls && nyc report --reporter=text-lcov | coveralls
+    - stage: integration-test
+      script:
+        - npm run test:integration:setup
+        - npm run test:integration
+        - npm run test:integration:cleanup
+    - stage: tag
+      script:
+        - VERSION=$(cat package.json | jq .version)
+        - if [ -n "$(git tag -l $VERSION)" ]; then git tag $VERSION && git push --tags ; fi
+    - stage: deploy
+      script: skip
+      deploy:
+        provider: npm
+        email: iain.allan.mcdonald@googlemail.com
+        api_key:
+          secure: m+l3+bzLK+MXRPzGVWzXK7MKnpeZ/d/+jkZtdIckn/OXeOJBgr6tMIMoS07XsYYCf6zg9p+cdwWw6Gu0Vgzjyl8+n4qXweQWjwdc/jvRlO/wUg1EJbwyDhYGdLL3n+mLmDDmTcXGvVqZHKWLzp3uF0o8v5fxEfYO8Hwdx7OCgiB1b6bFolPTqGSO9OL2jJEV/p3WGed/H70nyu4PC3Oe9dOiaeolb8q6XHTi4/nATkQgV+1Jng1z4AIqbkGlGLZYFvPDhqHwko+vgIP2fAdkoKatNMBcn3sf1zWNRuKLVGVxSw81rcSjiL7PRfDcTHTB/axSEdc+X8bJOwsGOMjwjE7XNtzLO0EArIW0ytc5cs3hZZ7oHkPSy+66WxWQltMp7tWzzXnw0MT3d58j9Fs/nwuZa8Z8DZ11cFYwRGAmnCl+vsMeaYkoIBxcdXllhDn3HdW+7bsDZUzlH1rEZt6zYf6vglWSi0bwk4hWAuf2rWhNqKejXabxbcRvjL2P+2VnpJuOMCs3fXNjndig+/zngayoZDWU5CRxIFcvKqIVWW5ju6DnpOCiUQpzX0wngZinNkqQR7QQA5k021cC2BUCufCaE5Uj1Z6Tbup/y1zcBatg6wZ5gAF5+ePImG9HPFbcXX05XVsISJD/n/AMXxBo+0hWbWrdNfalQZpwHP7raLY=
+        on:
+          tags: true
+          repo: iamcdonald/pckr
+          if: tag =~ ^([0-9]\.){2}[0-9]$
