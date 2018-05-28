@@ -28,7 +28,7 @@ jobs:
       script:
         - npm run test:integration:setup
         - npm run test:integration
-        - npm run test:integration:cleanup
+        - npm run test:integration:teardown
     - stage: tag
       script:
         - VERSION=$(cat package.json | jq .version)

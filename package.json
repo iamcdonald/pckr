@@ -13,7 +13,7 @@
   "scripts": {
     "test:unit": "ava 'test/unit/**/*.spec.js' -s",
     "test:integration:setup": "test/integration/scripts/setup.sh",
-    "test:integration:cleanup": "test/integration/scripts/cleanup.sh",
+    "test:integration:teardown": "test/integration/scripts/cleanup.sh",
     "test:integration": "ava 'test/integration/**/*.spec.js' -s",
     "test:coverage": "nyc npm run test:unit"
   },
