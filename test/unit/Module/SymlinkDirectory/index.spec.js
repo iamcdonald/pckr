@@ -71,6 +71,18 @@ test('SymlinkDirectory - addFile - when no name provided - moves file to sym-dep
   td.verify(stubs.fse.renameSync(file, `${location}/sym-deps/here-0.0.0.tgz`));
 });
 
+test('SymlinkDirectory - addFile - when name provided - copies file to sym-deps directory under provided name', t => {
+  t.plan(0);
+  const { SymlinkDirectory, stubs } = t.context;
+  const location = '/a/b/c'
+  const file = '/a/file/here-0.0.0.tgz';
+  const name = 'a-name.tgz';
+  td.when(stubs.path.basename(file)).thenReturn('here-0.0.0.tgz');
+  const sd = new SymlinkDirectory(location);
+  sd.addFile(file, name);
+  td.verify(stubs.fse.renameSync(file, `${location}/sym-deps/a-name.tgz`));
+});
+
 test('SymlinkDirectory - copyFile - when no name provided - copies file to sym-deps directory under same name', t => {
   t.plan(0);
   const { SymlinkDirectory, stubs } = t.context;

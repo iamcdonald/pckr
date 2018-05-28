@@ -46,19 +46,19 @@ test('Pckr - pack - packs given module and returns path to .tgz', async t => {
   t.truthy(fse.existsSync(packedPath));
 });
 
-test('Pckr - pack - includes symlinked top level dependencies', async t => {
+test('Pckr - pack - includes all symlinked dependencies in correct order', async t => {
   const p = new Pckr(MODULE_TO_PACK);
   const packedPath = await p.pack(TO_LOCATION);
   const extracted = untar(packedPath);
-  t.truthy(hasPackagedSubModule(extracted, 'two-x-x-1.0.0.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '0.five-x-x-1.0.0.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '1.three-x-x-1.0.0.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '2.nsp-four-x-x-1.0.0.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '3.two-x-x-1.0.0.tgz'));
 });
 
-test('Pckr - pack - includes nested symlink dependencies', async t => {
+test('Pckr - pack - includes pckr dependency', async t => {
   const p = new Pckr(MODULE_TO_PACK);
   const packedPath = await p.pack(TO_LOCATION);
   const extracted = untar(packedPath);
-  const twoDepPath = getSymlinkDepPath(extracted, 'two-x-x-1.0.0.tgz');
-  const twoExtracted = untar(twoDepPath);
-  t.truthy(hasPackagedSubModule(twoExtracted, 'three-x-x-1.0.0.tgz'));
-  t.truthy(hasPackagedSubModule(twoExtracted, 'nsp-four-x-x-1.0.0.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, 'pckr-0.0.1.tgz'));
 });

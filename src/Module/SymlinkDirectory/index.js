@@ -34,8 +34,8 @@ class SymlinkDirectory {
     return fse.existsSync(this.getPath());
   }
 
-  addFile(file) {
-    const filename = path.basename(file);
+  addFile(file, name) {
+    const filename = name || path.basename(file);
     const toLocation = path.resolve(this.getPath(), filename);
     fse.renameSync(file, toLocation);
     return toLocation;
