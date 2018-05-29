@@ -17,7 +17,7 @@ stages:
   - name: tag
     if: branch = debug
   - name: deploy
-    if: tag =~ ^([0-9]\.){2}[0-9](-alpha)?$
+    if: tag =~ ^([0-9]\.){2}[0-9].*$
 
 jobs:
   include:
@@ -52,4 +52,4 @@ jobs:
         on:
           tags: true
           repo: iamcdonald/pckr
-          if: tag =~ ^([0-9]\.){2}[0-9](-alpha)?$
+          if: tag =~ ^([0-9]\.){2}[0-9].*$
