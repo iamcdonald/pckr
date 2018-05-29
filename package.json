@@ -1,6 +1,6 @@
 {
   "name": "pckr",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "",
   "main": "src/Pckr.js",
   "bin": {
