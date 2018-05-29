@@ -8,7 +8,12 @@ const setup = () => {
   });
 
   const stubs = {
-    child_process: td.replace('child_process')
+    child_process: td.replace('child_process'),
+    process: td.replace('process', {
+      env: {
+        the: 'env vars'
+      }
+    })
   };
   const testee = require('../../../src/npm/index');
   return { stubs, testee };
@@ -32,7 +37,8 @@ test('npm - pack - packs and returns package name from npm pack', t => {
   const modulePath = '/c/module/yeah';
   const packageName = 'yeah-0.0.0.tgz';
   td.when(stubs.child_process.execSync('npm pack', {
-    cwd: modulePath
+    cwd: modulePath,
+    env: stubs.process.env
   })).thenReturn(new Buffer(packageName))
   t.is(testee.pack(modulePath), packageName);
 });
@@ -44,6 +50,7 @@ test('npm - installFileToModule - npm installs file for given module', t => {
   const module = '/a/module';
   testee.installFileToModule(file, module);
   td.verify(stubs.child_process.execSync(`npm install ${file}`, {
-    cwd: module
+    cwd: module,
+    env: stubs.process.env
   }));
 });

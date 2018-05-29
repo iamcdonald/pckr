@@ -44,7 +44,7 @@ test.beforeEach(async t => {
 
 test.afterEach.always(teardown);
 
-test('Pckr - install - installs all deps in sym-deps', async t => {
+test('Pckr - install - installs all deps in sym-deps', t => {
   const { extractPath } = t.context;
   execSync('npm install', {
     cwd: extractPath
