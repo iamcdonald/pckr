@@ -12,7 +12,8 @@ const pack = (modulePath) => {
 const installFileToModule = (file, modulePath) => {
   execSync(`npm install ${file}`, {
     cwd: modulePath,
-    env: process.env
+    env: process.env,
+    stdio: 'inherit'
   });
 };
 
