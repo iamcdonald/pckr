@@ -51,6 +51,7 @@ test('npm - installFileToModule - npm installs file for given module', t => {
   testee.installFileToModule(file, module);
   td.verify(stubs.child_process.execSync(`npm install ${file}`, {
     cwd: module,
-    env: stubs.process.env
+    env: stubs.process.env,
+    stdio: 'inherit'
   }));
 });

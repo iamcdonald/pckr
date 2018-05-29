@@ -168,11 +168,11 @@ test('SymlinkDirectory - getPckrPath - returns file matching pckr file name from
   const location = '/a/b/c'
   const files = [
     'file-1.tgz',
-    'pckr-2.0.0.tgz',
+    'pckr-2.0.0-alpha.tgz',
     'file-3.tgz'
   ];
   td.when(stubs.fse.existsSync(`${location}/sym-deps`)).thenReturn(true);
   td.when(stubs.fse.readdirSync(`${location}/sym-deps`)).thenReturn(files);
   const sd = new SymlinkDirectory(location);
-  t.is(sd.getPckrPath(), `./sym-deps/pckr-2.0.0.tgz`);
+  t.is(sd.getPckrPath(), `./sym-deps/pckr-2.0.0-alpha.tgz`);
 });

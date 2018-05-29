@@ -60,5 +60,5 @@ test('Pckr - pack - includes pckr dependency', async t => {
   const p = new Pckr(MODULE_TO_PACK);
   const packedPath = await p.pack(TO_LOCATION);
   const extracted = untar(packedPath);
-  t.truthy(hasPackagedSubModule(extracted, /pckr-(\d\.){3}tgz/));
+  t.truthy(hasPackagedSubModule(extracted, /pckr-(\d\.){2}\d.*\.tgz/));
 });

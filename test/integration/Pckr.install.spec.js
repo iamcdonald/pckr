@@ -47,7 +47,8 @@ test.afterEach.always(teardown);
 test('Pckr - install - installs all deps in sym-deps', t => {
   const { extractPath } = t.context;
   execSync('npm install', {
-    cwd: extractPath
+    cwd: extractPath,
+    stdio: 'inherit'
   });
   const index = require(path.resolve(extractPath, 'index'));
   const expected = [
