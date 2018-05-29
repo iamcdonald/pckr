@@ -2,7 +2,7 @@ const path = require('path');
 const fse = require('fs-extra');
 
 const SYM_DEPS_DIR = 'sym-deps'
-const PCKR_REG_EX = /.*pckr-(\d\.){3}tgz/;
+const PCKR_REG_EX = /.*pckr-(\d\.){2}\d[^\.]*\.tgz/;
 
 const relativeTo = base => filePath => `./${path.relative(base, filePath)}`;
 
