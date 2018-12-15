@@ -30,6 +30,7 @@ jobs:
         - npm install coveralls && nyc report --reporter=text-lcov | coveralls
     - stage: integration-test
       script:
+        - ls test/integration/test-project/packages/two/
         - npm run test:integration:setup
         - npm run test:integration
         - npm run test:integration:teardown
