@@ -124,7 +124,7 @@ test('SymlinkDirectory - getFilePaths - when directory exists - returns files in
   });
 });
 
-test('SymlinkDirectory - getFilePaths - when directory exists - returns files in directory', t => {
+test('SymlinkDirectory - getFilePaths - when directory does not exist - returns no files', t => {
   const { SymlinkDirectory, stubs } = t.context;
   const location = '/a/b/c'
   const files = [

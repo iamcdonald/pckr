@@ -28,10 +28,10 @@
   },
   "homepage": "https://github.com/iamcdonald/pckr#readme",
   "devDependencies": {
-    "ava": "^0.23.0",
+    "ava": "^1.0.1",
     "forestry": "^0.4.1",
-    "nyc": "^11.3.0",
-    "testdouble": "^3.2.6"
+    "nyc": "^13.1.0",
+    "testdouble": "^3.9.1"
   },
   "dependencies": {
     "commander": "^2.12.1",
