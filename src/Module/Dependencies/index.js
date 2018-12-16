@@ -1,5 +1,13 @@
 const path = require('path');
 const fs = require('fs');
+const PackageJson = require('../PackageJson');
+const options = require('../../options');
+
+const isPathToModule = (name, filepath) => {
+  const n = name.split(path.sep)
+  const fp = filepath.split(path.sep).slice(-n.length)
+  return fp.join(path.sep) === n.join(path.sep)
+}
 
 const isModule = modulePath =>
   fs.existsSync(path.resolve(modulePath, 'package.json'));
@@ -27,6 +35,7 @@ const getInstalledDependencies = folder => {
 class Dependencies {
   constructor(location) {
     this.location = location;
+    this.packageJson = new PackageJson(location);
   }
 
   hasNodeModulesDirectory() {
@@ -45,8 +54,13 @@ class Dependencies {
   }
 
   getSymlinked() {
-    return this.get()
+    const symlinked = this.get()
       .filter(path => isSymlink(path));
+    if (options.get().production) {
+      const dependencies = Object.keys(this.packageJson.getDependencies())
+      return symlinked.filter(path => dependencies.some(name => isPathToModule(name, path)))
+    }
+    return symlinked
   }
 };
 
