@@ -15,8 +15,8 @@ program
   .command('pack')
   .option('-p, --production', 'Only install production dependencies')
   .action(function (cmd) {
-    const pckr = new Pckr(process.cwd());
-    pckr.pack(cmd.production);
+    const pckr = new Pckr(process.cwd(), cmd.production);
+    pckr.pack();
   });
 
 program.parse(process.argv);
