@@ -9,6 +9,9 @@
   "dependencies": {
     "two-x-x": "*"
   },
+  "devDependencies": {
+    "six-x-x": "*"
+  },
   "author": "",
   "license": "ISC"
 }

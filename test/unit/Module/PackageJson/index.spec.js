@@ -211,10 +211,22 @@ test('PackageJson - getDependencies - returns dependencies from modules package.
   t.deepEqual(pj.getDependencies(), packageJson.dependencies);
 });
 
-test('PackageJson - getDependencies - returns empty pobject if no dependencies in package.json', t => {
+test('PackageJson - getDependencies - returns empty object if no dependencies in package.json', t => {
   const packageJson = {
   };
   const { stubs, PackageJson, c } = setupStubs(t.context, packageJson);
   const pj = new PackageJson(c.location);
   t.deepEqual(pj.getDependencies(), {});
+});
+
+test('PackageJson - removeDevDependencies - removes all devDependencies', t => {
+  const packageJson = {
+    devDependencies: {
+      'hello': '*'
+    }
+  };
+  const { stubs, PackageJson, c } = setupStubs(t.context, packageJson);
+  const pj = new PackageJson(c.location);
+  pj.removeDevDependencies()
+  t.deepEqual(pj._packageJson.devDependencies, {});
 });

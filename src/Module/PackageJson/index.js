@@ -41,6 +41,10 @@ class PackageJson {
     this._packageJson.dependencies && delete this._packageJson.dependencies[dependency];
   }
 
+  removeDevDependencies() {
+    this._packageJson.devDependencies = {};
+  }
+
   replace() {
     fse.renameSync(this._packageJsonPath, this._tempPackageJsonPath);
     fse.writeFileSync(this._packageJsonPath, JSON.stringify(this._packageJson, null, '\t'));

@@ -6,6 +6,7 @@ const Dependencies = require('./Dependencies');
 const SymlinkDirectory = require('./SymlinkDirectory');
 const PackageJson = require('./PackageJson');
 const pckrPckr = require('../pckrPckr');
+const options = require('../options');
 
 const buildModuleDependenciesTree = (m, level = 1) => ({
   module: m,
@@ -62,6 +63,9 @@ class Module {
     this.packageJson.updateScripts({
       postinstall: `npm install ${this.symlinkDirectory.getPckrPath()} && pckr install`
     });
+    if (options.get().production) {
+      this.packageJson.removeDevDependencies();
+    }
     this.packageJson.replace();
   }
 
