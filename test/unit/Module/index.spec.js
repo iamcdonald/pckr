@@ -15,11 +15,14 @@ const setup = () => {
       pack: td.function(),
       installFileToModule: td.function()
     }),
+    options: td.replace('../../../src/options'),
     pckrPckr: td.replace('../../../src/pckrPckr'),
     Dependencies: td.replace('../../../src/Module/Dependencies'),
     SymlinkDirectory: td.replace('../../../src/Module/SymlinkDirectory'),
     PackageJson: td.replace('../../../src/Module/PackageJson')
   };
+
+  td.when(stubs.options.get()).thenReturn({ production: false })
 
   stubs.path.resolve = function () {
     return [...arguments].join('/');
@@ -61,6 +64,7 @@ const setupPackageJsonStub = n => {
   const stub = td.object([
     'updateScripts',
     'removeDependency',
+    'removeDevDependencies',
     'replace',
     'restore',
     'getName',
@@ -262,6 +266,16 @@ test('Module - pack - non-root - only npm packs module and assigns resulting nam
   td.verify(p.packageJson.updateScripts(), { times: 0, ignoreExtraArgs: true });
   td.verify(p.packageJson.restore(), { times: 0, ignoreExtraArgs: true });
   td.verify(p.symlinkDirectory.remove(), { times: 0, ignoreExtraArgs: true });
+});
+
+test('Module - pack - when production is true - removes all dev dependencies from packageJson', async t => {
+  t.plan(0);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name, true);
+  td.when(stubs.npm.pack(p.location)).thenReturn('a filename');
+  td.when(stubs.options.get()).thenReturn({ production: true })
+  await p.pack();
+  td.verify(p.packageJson.removeDevDependencies());
 });
 
 test('Module - getPackagePath - when module not yet packed throws error', t => {

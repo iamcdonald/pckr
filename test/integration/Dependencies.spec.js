@@ -7,6 +7,7 @@ test('Dependencies - getSymlinked - retrieves symlinked modules - I', t => {
   const oneModulePath = path.resolve(__dirname, 'test-project', 'packages', 'one');
   const d = new Dependencies(oneModulePath);
   t.deepEqual(d.getSymlinked(), [
+    path.resolve(oneModulePath, 'node_modules', 'six-x-x'),
     path.resolve(oneModulePath, 'node_modules', 'two-x-x')
   ]);
 });

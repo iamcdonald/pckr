@@ -21,9 +21,9 @@ const getSymlinkDepPath = (modulePath, subModule) =>
 const hasPackagedSubModule = (modulePath, subModule) =>
   fse.existsSync(getSymlinkDepPath(modulePath, subModule));
 
-const setup = async () => {
+const setup = async (production = false) => {
   fse.mkdirSync(path.resolve(__dirname, TMP_DIR));
-  const p = new Pckr(MODULE_TO_PACK);
+  const p = new Pckr(MODULE_TO_PACK, { production });
   const packedPath = await p.pack(TO_LOCATION);
   const extractOne = untar(packedPath);
   return extractOne;
@@ -36,16 +36,29 @@ const teardown = () => {
 const isInstalled = (module, extractPath) =>
   fse.existsSync(path.resolve(extractPath, 'node_modules', module));
 
-test.beforeEach(async t => {
-  t.context = {
-    extractPath: await setup()
-  };
-});
-
 test.afterEach.always(teardown);
 
-test('Pckr - install - installs all deps in sym-deps', t => {
-  const { extractPath } = t.context;
+test('Pckr - install - installs all deps in sym-deps', async t => {
+  const extractPath = await setup();
+  execSync('npm install', {
+    cwd: extractPath,
+    stdio: 'inherit'
+  });
+  const index = require(path.resolve(extractPath, 'index'));
+  const expected = [
+    'one',
+    ['two',
+      ['three'],
+      ['four', ['five']],
+      ['five'],
+      '001'
+    ]
+  ];
+  t.deepEqual(expected, index());
+});
+
+test('Pckr - install - only prod - installs all deps in sym-deps', async t => {
+  const extractPath = await setup(true);
   execSync('npm install', {
     cwd: extractPath,
     stdio: 'inherit'
