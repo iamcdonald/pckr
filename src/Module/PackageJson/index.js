@@ -20,6 +20,10 @@ class PackageJson {
     return this._packageJson.version;
   }
 
+  getDependencies() {
+    return this._packageJson.dependencies;
+  }
+
   updateScripts(scripts) {
     this._packageJson.scripts = Object.keys(scripts)
       .reduce((existingScripts, key) => {
