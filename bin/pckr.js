@@ -13,8 +13,11 @@ program
 
 program
   .command('pack')
-  .action(function () {
-    const pckr = new Pckr(process.cwd());
+  .option('-p, --production', 'Only install production dependencies')
+  .action(function (cmd) {
+    const pckr = new Pckr(process.cwd(), {
+      production: cmd.production
+    });
     pckr.pack();
   });
 

@@ -10,6 +10,7 @@ $ npm install pckr
 
 ## Command Line
 ```sh
-pckr pack     //packs current module
-pckr install  //install module symlinked dependencies
+pckr pack              //packs current module
+pckr pack --production //packs current module ignoring any non-production symlinked dependencies
+pckr install           //install module symlinked dependencies
 ```

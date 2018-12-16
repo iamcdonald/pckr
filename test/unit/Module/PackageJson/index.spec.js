@@ -198,3 +198,23 @@ test('PackageJson - getVersion - returns version from modules package.json', t =
   const pj = new PackageJson(c.location);
   t.is(pj.getVersion(), '2.2.2');
 });
+
+test('PackageJson - getDependencies - returns dependencies from modules package.json', t => {
+  const packageJson = {
+    dependencies: {
+      hello: '1.0.0',
+      goodbye: '2.0.1'
+    }
+  };
+  const { stubs, PackageJson, c } = setupStubs(t.context, packageJson);
+  const pj = new PackageJson(c.location);
+  t.deepEqual(pj.getDependencies(), packageJson.dependencies);
+});
+
+test('PackageJson - getDependencies - returns empty pobject if no dependencies in package.json', t => {
+  const packageJson = {
+  };
+  const { stubs, PackageJson, c } = setupStubs(t.context, packageJson);
+  const pj = new PackageJson(c.location);
+  t.deepEqual(pj.getDependencies(), {});
+});

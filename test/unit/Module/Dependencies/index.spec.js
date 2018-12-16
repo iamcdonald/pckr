@@ -1,12 +1,16 @@
 const test = require('ava');
 const td = require('testdouble');
 const Forestry = require('forestry');
+const path = require('path');
 
 const setup = () => {
   const stubs = {
     fs: td.replace('fs'),
-    path: td.replace('path')
+    path: td.replace('path'),
+    PackageJson: td.replace('../../../../src/Module/PackageJson'),
+    options: td.replace('../../../../src/options')
   };
+  stubs.path.basename = path.basename
   stubs.path.resolve = function () {
     return [...arguments].join('/');
   };
@@ -145,7 +149,7 @@ test('Dependencies - get - returns empty array if no node_modules folder', t => 
 });
 
 
-test('Dependencies - getSymlinked - returns symlinked modules', t => {
+test('Dependencies - getSymlinked - when include all symlinked deps - returns symlinked modules', t => {
   const folderStruct = {
     name: 'a',
     subDirs: [{
@@ -169,9 +173,112 @@ test('Dependencies - getSymlinked - returns symlinked modules', t => {
     }]
   };
   const { Dependencies, c } = stubWithFakeFileDirectory(folderStruct, t.context);
+  const { stubs } = t.context;
+  td.when(stubs.options.get()).thenReturn({ production: false })
   const d = new Dependencies(c.tree.data.name);
   t.deepEqual(d.getSymlinked(), [
     'a/node_modules/b',
     'a/node_modules/c/e'
   ]);
+});
+
+test('Dependencies - getSymlinked - when include production only deps - returns symlinked prod dependency modules', t => {
+  const folderStruct = {
+    name: 'a',
+    subDirs: [{
+      name: 'node_modules',
+      subDirs: [{
+        name: 'a',
+        isModule: true
+      }, {
+        name: 'b',
+        isModule: true,
+        isSymlink: true
+      }, {
+        name: 'c',
+        isDirectory: true,
+        subDirs: [{
+          name: 'e',
+          isModule: true,
+          isSymlink: true
+        }]
+      }]
+    }]
+  };
+  const { Dependencies, c } = stubWithFakeFileDirectory(folderStruct, t.context);
+  const { stubs } = t.context;
+  td.when(stubs.PackageJson.prototype.getDependencies()).thenReturn({
+    b: '1.0.0'
+  });
+  td.when(stubs.options.get()).thenReturn({ production: true })
+  const d = new Dependencies(c.tree.data.name);
+  t.deepEqual(d.getSymlinked(), [
+    'a/node_modules/b'
+  ]);
+});
+
+test('Dependencies - getSymlinked - when include production only deps - handles name-spaced modules', t => {
+  const folderStruct = {
+    name: 'a',
+    subDirs: [{
+      name: 'node_modules',
+      subDirs: [{
+        name: 'a',
+        isModule: true
+      }, {
+        name: 'b',
+        isModule: true,
+        isSymlink: true
+      }, {
+        name: '@c',
+        isDirectory: true,
+        subDirs: [{
+          name: 'e',
+          isModule: true,
+          isSymlink: true
+        }]
+      }]
+    }]
+  };
+  const { Dependencies, c } = stubWithFakeFileDirectory(folderStruct, t.context);
+  const { stubs } = t.context;
+  td.when(stubs.PackageJson.prototype.getDependencies()).thenReturn({
+    '@c/e': '1.0.0'
+  });
+  td.when(stubs.options.get()).thenReturn({ production: true })
+  const d = new Dependencies(c.tree.data.name);
+  t.deepEqual(d.getSymlinked(), [
+    'a/node_modules/@c/e'
+  ]);
+});
+
+test('Dependencies - getSymlinked - when include production only deps - ignore non-prod dependencies', t => {
+  const folderStruct = {
+    name: 'a',
+    subDirs: [{
+      name: 'node_modules',
+      subDirs: [{
+        name: 'a',
+        isModule: true
+      }, {
+        name: 'b',
+        isModule: true,
+        isSymlink: true
+      }, {
+        name: '@c',
+        isDirectory: true,
+        subDirs: [{
+          name: 'e',
+          isModule: true,
+          isSymlink: true
+        }]
+      }]
+    }]
+  };
+  const { Dependencies, c } = stubWithFakeFileDirectory(folderStruct, t.context);
+  const { stubs } = t.context;
+  td.when(stubs.PackageJson.prototype.getDependencies()).thenReturn({});
+  td.when(stubs.options.get()).thenReturn({ production: true })
+  const d = new Dependencies(c.tree.data.name);
+  t.deepEqual(d.getSymlinked(), []);
 });
