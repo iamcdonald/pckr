@@ -51,6 +51,17 @@ test('Pckr - pack - includes all symlinked dependencies in correct order', async
   const packedPath = await p.pack(TO_LOCATION);
   const extracted = untar(packedPath);
   t.truthy(hasPackagedSubModule(extracted, '0\.five-x-x-1\.0\.0\.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '1\.six-x-x-1\.0\.0\.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '2\.three-x-x-1\.0\.0\.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '3\.nsp-four-x-x-1\.0\.0\.tgz'));
+  t.truthy(hasPackagedSubModule(extracted, '4\.two-x-x-1\.0\.0\.tgz'));
+});
+
+test('Pckr - pack - includes all production symlinked dependencies in correct order', async t => {
+  const p = new Pckr(MODULE_TO_PACK, true);
+  const packedPath = await p.pack(TO_LOCATION);
+  const extracted = untar(packedPath);
+  t.truthy(hasPackagedSubModule(extracted, '0\.five-x-x-1\.0\.0\.tgz'));
   t.truthy(hasPackagedSubModule(extracted, '1\.three-x-x-1\.0\.0\.tgz'));
   t.truthy(hasPackagedSubModule(extracted, '2\.nsp-four-x-x-1\.0\.0\.tgz'));
   t.truthy(hasPackagedSubModule(extracted, '3\.two-x-x-1\.0\.0\.tgz'));

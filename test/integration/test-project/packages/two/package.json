@@ -12,6 +12,9 @@
     "three-x-x": "*",
     "five-x-x": "*"
   },
+  "devDependencies": {
+    "six-x-x": "*"
+  },
   "author": "",
   "license": "ISC"
 }

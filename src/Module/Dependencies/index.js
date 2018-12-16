@@ -10,6 +10,12 @@ const isSymlink = path =>
 const isDirectory = src =>
   fs.statSync(src).isDirectory();
 
+const getPackageName = modulePath => {
+  const package = fs.readFileSync(path.resolve(modulePath, 'package.json'));
+  const packageJson = JSON.parse(package);
+  return packageJson.name;
+};
+
 const getSubDirsOfFolder = folder =>
   fs.readdirSync(folder)
     .map(subdir => path.resolve(folder, subdir))
@@ -44,10 +50,22 @@ class Dependencies {
     return [];
   }
 
-  getSymlinked() {
-    return this.get()
-      .filter(path => isSymlink(path));
+  getSymlinked(packageJson) {
+    let productionDependencies;
+    if (packageJson) {
+      productionDependencies = Object.keys(packageJson.getDependencies() || {});
+    }
+
+    const symlinked = this.get().filter(path => isSymlink(path));
+
+    if (productionDependencies) {
+      return symlinked.filter(path =>
+        productionDependencies.includes(getPackageName(path))
+      );
+    }
+
+    return symlinked;
   }
-};
+}
 
 module.exports = Dependencies;

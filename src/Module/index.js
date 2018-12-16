@@ -10,8 +10,8 @@ const pckrPckr = require('../pckrPckr');
 const buildModuleDependenciesTree = (m, level = 1) => ({
   module: m,
   level: level,
-  deps: m.dependencies.getSymlinked()
-    .map(location => new Module(location))
+  deps: m.dependencies.getSymlinked(m.prodOnly ? m.packageJson : false)
+    .map(location => new Module(location, false, m.prodOnly))
     .map(m => buildModuleDependenciesTree(m, level + 1))
 });
 
@@ -43,9 +43,10 @@ const sortByLevelInFileNameAscending = (a, b) => {
 };
 
 class Module {
-  constructor(location, root = false) {
+  constructor(location, root = false, prodOnly = false) {
     this.location = location;
     this.root = root;
+    this.prodOnly = prodOnly;
     this.packageJson = new PackageJson(location);
     this.dependencies = new Dependencies(location);
     this.symlinkDirectory = new SymlinkDirectory(location);

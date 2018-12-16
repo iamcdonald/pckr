@@ -2,8 +2,8 @@ const pckrPckr = require('./pckrPckr');
 const Module = require('./Module');
 
 class Pckr {
-  constructor(location) {
-    this.module = new Module(location, true);
+  constructor(location, prodOnly = false) {
+    this.module = new Module(location, true, prodOnly);
   }
 
   pack() {

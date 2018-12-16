@@ -161,6 +161,17 @@ test('Module - constructor - non-root', t => {
   t.is(p.packageJson, c.tree.data.stubs.packageJson);
 });
 
+test('Module - constructor - root production only', t => {
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name, true, true);
+  t.is(p.location, c.tree.data.name);
+  t.is(p.root, true);
+  t.is(p.prodOnly, true);
+  t.is(p.dependencies, c.tree.data.stubs.dependencies);
+  t.is(p.symlinkDirectory, c.tree.data.stubs.symlinkDirectory);
+  t.is(p.packageJson, c.tree.data.stubs.packageJson);
+});
+
 test('Module - pack - root - creates symlink directory', async t => {
   t.plan(0);
   const { Module, stubs, c } = t.context;
@@ -194,6 +205,17 @@ test('Module - pack - root - adds downstream symlink dependencies, excluding dup
   t.plan(0);
   const { Module, stubs, c } = t.context;
   const p = new Module(c.tree.data.name, true);
+  await p.pack();
+  td.verify(p.symlinkDirectory.addFile('a/b/c/c-0.0.0.tgz', '0.c-0.0.0.tgz'));
+  td.verify(p.symlinkDirectory.addFile('a/b/b-0.0.0.tgz', '1.b-0.0.0.tgz'));
+  td.verify(p.symlinkDirectory.addFile('a/d/d-0.0.0.tgz', '2.d-0.0.0.tgz'));
+  td.verify(p.symlinkDirectory.addFile(td.matchers.isA(String), td.matchers.isA(String)), { times: 3 });
+});
+
+test('Module - pack - root - adds downstream symlink dependencies, excluding duplicates, with correct ordered names to symlink directory - production only', async t => {
+  t.plan(0);
+  const { Module, stubs, c } = t.context;
+  const p = new Module(c.tree.data.name, true, true);
   await p.pack();
   td.verify(p.symlinkDirectory.addFile('a/b/c/c-0.0.0.tgz', '0.c-0.0.0.tgz'));
   td.verify(p.symlinkDirectory.addFile('a/b/b-0.0.0.tgz', '1.b-0.0.0.tgz'));

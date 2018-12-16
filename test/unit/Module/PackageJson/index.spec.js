@@ -198,3 +198,12 @@ test('PackageJson - getVersion - returns version from modules package.json', t =
   const pj = new PackageJson(c.location);
   t.is(pj.getVersion(), '2.2.2');
 });
+
+test('PackageJson - getVersion - returns name from modules package.json', t => {
+  const packageJson = {
+    dependencies: { lotsof: 'deps' }
+  };
+  const { stubs, PackageJson, c } = setupStubs(t.context, packageJson);
+  const pj = new PackageJson(c.location);
+  t.deepEqual(pj.getDependencies(), { lotsof: 'deps' });
+});
