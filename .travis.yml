@@ -48,7 +48,7 @@ jobs:
         provider: npm
         email: iain.allan.mcdonald@googlemail.com
         api_key:
-          secure: m+l3+bzLK+MXRPzGVWzXK7MKnpeZ/d/+jkZtdIckn/OXeOJBgr6tMIMoS07XsYYCf6zg9p+cdwWw6Gu0Vgzjyl8+n4qXweQWjwdc/jvRlO/wUg1EJbwyDhYGdLL3n+mLmDDmTcXGvVqZHKWLzp3uF0o8v5fxEfYO8Hwdx7OCgiB1b6bFolPTqGSO9OL2jJEV/p3WGed/H70nyu4PC3Oe9dOiaeolb8q6XHTi4/nATkQgV+1Jng1z4AIqbkGlGLZYFvPDhqHwko+vgIP2fAdkoKatNMBcn3sf1zWNRuKLVGVxSw81rcSjiL7PRfDcTHTB/axSEdc+X8bJOwsGOMjwjE7XNtzLO0EArIW0ytc5cs3hZZ7oHkPSy+66WxWQltMp7tWzzXnw0MT3d58j9Fs/nwuZa8Z8DZ11cFYwRGAmnCl+vsMeaYkoIBxcdXllhDn3HdW+7bsDZUzlH1rEZt6zYf6vglWSi0bwk4hWAuf2rWhNqKejXabxbcRvjL2P+2VnpJuOMCs3fXNjndig+/zngayoZDWU5CRxIFcvKqIVWW5ju6DnpOCiUQpzX0wngZinNkqQR7QQA5k021cC2BUCufCaE5Uj1Z6Tbup/y1zcBatg6wZ5gAF5+ePImG9HPFbcXX05XVsISJD/n/AMXxBo+0hWbWrdNfalQZpwHP7raLY=
+          secure: cesRM2sFgtdcv5IUpUc7jRPUSFSvnIWsC/tGLxdfwlTcYHROrMcpF+5Di6UozdeBvINS+1VOKTLE9Hv2hDabWNdrs1XP1DRioUam+zB4p7SsnkhIuc5OJ7a5pnw0Kj9bHTZxUSDpzvDZBVOFsDYn4yZZUxwdXUwsJJ3u11sOUTsb+eyYTX7BhQ+hncBUieFhew0kRq4MoQAg3xlXYPaXtaY2mwkB0+BqtTZWveZUG4obBmm6MkoUfDRtmmcaMhGuKNpi7VCrAjG+NAtltZQemjijtyYeC29dI8/QNGy40gxJTaIE0G3ge8hCCg+PS948Z+tJQIT8Ig+pWHR+9M6t8W9eengbQ4uUIrIhomIbaYS1PAu7C1gUx5LfcXBuw0dka3bg3oMzlsR1NRUJN7ZZrvKU7fiawoEIKYhM5hX+to9LiV8MB84XCg1z1Z7VPRBKpKFlmsi7K7iuOmTxFKZrK2nspWfEU0mHExVD/OAP1PavlHI6mZ5X8irrNExsGWNzTW8AnBw4h8nccx+ZQ1CPwZsSXpts+RXiBN/nInhpoo/S2AvZzhYTgs5cpc0Ukf8Oqy7AMgC3WTSGFGWMQUZ1y3llybC+4FQVXHsHJEQXQCpf2jPUqoBRGgtyio4blBbDsIMUnprydEKrF2DWd3l56dvr6WW0yVfNJnw8nXwzwHY=
         on:
           tags: true
           repo: iamcdonald/pckr
